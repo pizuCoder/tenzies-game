@@ -7,6 +7,26 @@ export default function App() {
 
     const [dice, setDice] = React.useState(allNewDice())
     const [tenzies, setTenzies] = React.useState(false)
+    const [rolls, setRolls] = React.useState(0)
+    const [highScore, setHighScore] = React.useState(null)
+    
+    
+
+
+    
+
+
+    
+
+    const updateHighScore = React.useCallback(() => {
+      const currentRollCount = Number(localStorage.getItem("highScore")) || 0;
+      const newRollCount = rolls + 1;
+      if (newRollCount < currentRollCount || currentRollCount === 0) {
+        localStorage.setItem("highScore", newRollCount);
+        setHighScore(newRollCount);
+      }
+    }, [rolls, setHighScore]);
+
     
     React.useEffect(() => {
         const allHeld = dice.every(die => die.isHeld)
@@ -14,8 +34,10 @@ export default function App() {
         const allSameValue = dice.every(die => die.value === firstValue)
         if (allHeld && allSameValue) {
             setTenzies(true)
+            updateHighScore()
+            
         }
-    }, [dice])
+    }, [ dice, updateHighScore])
 
     function generateNewDie() {
         return {
@@ -32,14 +54,20 @@ export default function App() {
         }
         return newDice
     }
-    
-/**
- * Challenge: Allow the user to play a new game when the
- * button is clicked and they've already won
- */
+
+    // function updateHighScore() {
+    //     const newRolls = rolls + 1
+    //     setRolls(newRolls)
+    //     const prevHighScore = localStorage.getItem("highScore")
+    //     if (prevHighScore === null || newRolls < prevHighScore) {
+    //         localStorage.setItem("highScore", newRolls)
+    //         setHighScore(newRolls)
+    //     }
+    // }
     
     function rollDice() {
         if(!tenzies) {
+            setRolls(rolls + 1)
             setDice(oldDice => oldDice.map(die => {
                 return die.isHeld ? 
                     die :
@@ -48,6 +76,7 @@ export default function App() {
         } else {
             setTenzies(false)
             setDice(allNewDice())
+            setRolls(0)
         }
     }
     
@@ -58,7 +87,17 @@ export default function App() {
                 die
         }))
     }
+
     
+
+    React.useEffect(() => {
+        const prevHighScore = localStorage.getItem("highScore")
+        if (prevHighScore !== null) {
+            setHighScore(parseInt(prevHighScore))
+        }
+        
+    }, [])
+
     const diceElements = dice.map(die => (
         <Die 
             key={die.id} 
@@ -67,16 +106,22 @@ export default function App() {
             holdDice={() => holdDice(die.id)}
         />
     ))
+
     
     return (
         <main>
             {tenzies && <Confetti />}
             <h1 className="title">Tenzies</h1>
-            <p className="instructions">Roll until all dice are the same. 
-            Click each die to freeze it at its current value between rolls.</p>
+            <p className="instructions" style={{whiteSpace: 'pre'}}>
+              { tenzies ? 'Congratuations! You Won! Start a new game to beat the best score!'
+              :'Roll until all dice are the same. Click each die to freeze it at its current value between rolls.\nThe best score is the lowest number of rolls taken to win'}
+            </p>
             <div className="dice-container">
                 {diceElements}
             </div>
+            <p>Best Score: {highScore-1}</p>
+            <p>Roll Count: {rolls}</p>
+            
             <button 
                 className="roll-dice" 
                 onClick={rollDice}
