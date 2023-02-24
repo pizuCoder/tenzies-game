@@ -112,15 +112,17 @@ export default function App() {
         <main>
             {tenzies && <Confetti />}
             <h1 className="title">Tenzies</h1>
-            <p className="instructions" style={{whiteSpace: 'pre'}}>
-              { tenzies ? 'Congratuations! You Won! Start a new game to beat the best score!'
-              :'Roll until all dice are the same. Click each die to freeze it at its current value between rolls.\nThe best score is the lowest number of rolls taken to win'}
+           
+            <p className="instructions" style={{whiteSpace: 'pre-wrap'}}>
+              { tenzies ? 'Congratuations! You Won! \nStart a new game to beat the best score!'
+              :'Roll until all dice are the same.\n Click each die to freeze it at its current value between rolls.\nThe best score is the lowest number of rolls taken to win'}
             </p>
+            
             <div className="dice-container">
                 {diceElements}
             </div>
-            <p>Best Score: {highScore-1}</p>
-            <p>Roll Count: {rolls}</p>
+            <h3>Best Score: {highScore-1}</h3>
+            <h3>Roll Count: {rolls}</h3>
             
             <button 
                 className="roll-dice" 
